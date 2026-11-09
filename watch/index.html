@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Watch - Launchpad</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="theme-color" content="#4f46e5">
+<script>
+try{ var m = document.cookie.match(/(?:^|; )hl_theme=(dark|light|system)/), t = m ? m[1] : JSON.parse(localStorage.getItem("hl.theme"));
+     if(t === "dark" || t === "light") document.documentElement.setAttribute("data-theme", t); }catch(e){}
+</script>
+<link rel="stylesheet" href="https://suite.civilinitiatives.org/office/office.css?b=20261109c">
+<link rel="stylesheet" href="/h.css?b=20261109a">
+<link rel="stylesheet" href="https://civilinitiatives.org/glass.css?b=20261102a">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/" title="Launchpad videos"><i aria-hidden="true">🎬</i><span>Launchpad Videos</span></a>
+  <span class="status" id="status" aria-live="polite"></span>
+  <span class="sp"></span>
+  <a class="tbtn" href="https://files.civilinitiatives.org/">🗂<span class="lbl"> My Files</span></a>
+  <a class="tbtn" href="https://suite.civilinitiatives.org/vids/">🎬<span class="lbl"> Make a video</span></a>
+  <button class="tbtn" id="themeBtn" type="button"></button>
+  <a class="tbtn" href="https://civilinitiatives.org/">Launchpad</a>
+</header>
+<main id="main"><p class="empty">Loading…</p></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0/dist/umd/supabase.js"></script>
+<script src="/auth-store.js?b=20261026a"></script>
+<script src="https://suite.civilinitiatives.org/office/office.js?b=20261109d"></script>
+<script src="/h.js?b=20261109a"></script>
+<script src="/watch.js?b=20261109a"></script>
+</body>
+</html>
