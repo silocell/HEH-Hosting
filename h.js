@@ -42,4 +42,43 @@
     }
   };
   Office.themeToggle(document.getElementById("themeBtn"));
+  H.postDialog = function (opt) {
+    opt = opt || {};
+    var d = document.createElement("dialog"); d.className = "of-dialog";
+    d.innerHTML = '<div class="of-dhead"><h2>＋ ' + (opt.short ? 'Post a Short' : 'Post a video') + '</h2><button type="button" class="of-x" data-x aria-label="Close">✕</button></div><form class="f">' +
+      '<label>The video - up to 30 minutes. Anything up to 100 seconds can be a Short.<input type="file" name="file" accept="video/mp4,video/webm,video/quicktime" required></label><video controls playsinline hidden></video>' +
+      '<label>Name<input type="text" name="t" maxlength="100" required placeholder="What it\'s called"></label>' +
+      '<label>About it <small style="font-weight:400;color:var(--soft)">(optional)</small><textarea name="a" rows="3" maxlength="1000"></textarea></label>' +
+      '<div class="kind" hidden><label>Post it as</label><div class="who"><label><input type="radio" name="k" value="short"> 📱 A Short <small style="font-weight:400;color:var(--soft)">- in the swipe-up Shorts feed</small></label><label><input type="radio" name="k" value="video"> 🎬 A video <small style="font-weight:400;color:var(--soft)">- in Videos</small></label></div></div><p class="kindnote" hidden style="color:var(--soft);font-size:.86rem;margin:0"></p>' +
+      '<label>Who can watch it</label><div class="who"><label><input type="radio" name="w" value="1" checked> Everyone on the Launchpad</label><label><input type="radio" name="w" value="0"> Just me</label></div>' +
+      '<p class="rules">Only post videos that are kind and OK for school. Don\'t show anyone who hasn\'t said yes. Anyone can report a video, and a reported video is hidden until an admin checks it.</p>' +
+      '<p class="of-err" role="alert" style="color:#dc2626"></p><p class="of-where" id="pstep"></p><div class="prog2" hidden><div></div></div><div class="of-new"><button type="submit" class="of-btn">Post it</button></div></form>';
+    document.body.appendChild(d); d.showModal();
+    var fm = d.querySelector("form"), vid = d.querySelector("video"), secs = 0;
+    fm.file.onchange = function () {
+      var f = fm.file.files[0]; if (!f) return;
+      vid.hidden = false; vid.src = URL.createObjectURL(f); vid.onloadedmetadata = function () {
+        secs = isFinite(vid.duration) ? vid.duration : 0;
+        var kind = d.querySelector(".kind"), note = d.querySelector(".kindnote");
+        if (secs && secs <= 100) { kind.hidden = false; note.hidden = true; fm.k.value = opt.short === false ? "video" : "short"; }
+        else { kind.hidden = true; note.hidden = !(secs > 100); note.textContent = "It's over 100 seconds (" + H.len(secs) + "), so it goes in Videos. Shorts are up to 100 seconds."; }
+      };
+      if (!fm.t.value) fm.t.value = f.name.replace(/\.[^.]+$/, "").slice(0, 100);
+    };
+    d.addEventListener("click", function (e) { if (e.target === d || e.target.closest("[data-x]")) { d.close(); d.remove(); } });
+    fm.onsubmit = function (e) {
+      e.preventDefault();
+      var f = fm.file.files[0], err = d.querySelector(".of-err"), btn = fm.querySelector("[type=submit]");
+      if (!f) return;
+      var stepEl = d.querySelector("#pstep"), bar = d.querySelector(".prog2");
+      btn.disabled = true; btn.textContent = "Working…"; err.textContent = ""; bar.hidden = false;
+      Office.postVideo(f, fm.t.value.trim(), fm.a.value, secs, fm.w.value === "1", {
+        short: secs && secs <= 100 ? fm.k.value === "short" : false,
+        onstep: function (t) { stepEl.textContent = t; bar.firstChild.style.width = "0%"; },
+        onprog: function (x) { bar.firstChild.style.width = Math.round(x * 100) + "%"; }
+      }).then(function (r) {
+        d.close(); d.remove(); location.href = (secs && secs <= 100 && fm.k.value === "short" ? "/shorts/?v=" : "/watch/?v=") + encodeURIComponent(r.id);
+      }).catch(function (x) { btn.disabled = false; btn.textContent = "Post it"; bar.hidden = true; stepEl.textContent = ""; err.textContent = x.message || String(x); });
+    };
+  };
 })();

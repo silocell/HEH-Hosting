@@ -32,35 +32,5 @@
     if (b.dataset.show) { show = b.dataset.show; load(); return; }
     if (b.id === "postBtn") postDialog();
   });
-  function postDialog() {
-    var d = document.createElement("dialog"); d.className = "of-dialog";
-    d.innerHTML = '<div class="of-dhead"><h2>＋ Post a video</h2><button type="button" class="of-x" data-x aria-label="Close">✕</button></div><form class="f">' +
-      '<label>The video - up to 30 minutes. Tall and up to 100 seconds = a Short.<input type="file" name="file" accept="video/mp4,video/webm,video/quicktime" required></label><video controls playsinline hidden></video>' +
-      '<label>Name<input type="text" name="t" maxlength="100" required placeholder="What it\'s called"></label>' +
-      '<label>About it <small style="font-weight:400;color:var(--soft)">(optional)</small><textarea name="a" rows="3" maxlength="1000"></textarea></label>' +
-      '<label>Who can watch it</label><div class="who"><label><input type="radio" name="w" value="1" checked> Everyone on the Launchpad</label><label><input type="radio" name="w" value="0"> Just me</label></div>' +
-      '<p class="rules">Only post videos that are kind and OK for school. Don\'t show anyone who hasn\'t said yes. Anyone can report a video, and a reported video is hidden until an admin checks it.</p>' +
-      '<p class="of-err" role="alert" style="color:#dc2626"></p><p class="of-where" id="pstep"></p><div class="prog2" hidden><div></div></div><div class="of-new"><button type="submit" class="of-btn">Post it</button></div></form>';
-    document.body.appendChild(d); d.showModal();
-    var fm = d.querySelector("form"), vid = d.querySelector("video"), secs = 0;
-    fm.file.onchange = function () {
-      var f = fm.file.files[0]; if (!f) return;
-      vid.hidden = false; vid.src = URL.createObjectURL(f); vid.onloadedmetadata = function () { secs = isFinite(vid.duration) ? vid.duration : 0; };
-      if (!fm.t.value) fm.t.value = f.name.replace(/\.[^.]+$/, "").slice(0, 100);
-    };
-    d.addEventListener("click", function (e) { if (e.target === d || e.target.closest("[data-x]")) { d.close(); d.remove(); } });
-    fm.onsubmit = function (e) {
-      e.preventDefault();
-      var f = fm.file.files[0], err = d.querySelector(".of-err"), btn = fm.querySelector("[type=submit]");
-      if (!f) return;
-      var stepEl = d.querySelector("#pstep"), bar = d.querySelector(".prog2");
-      btn.disabled = true; btn.textContent = "Working…"; err.textContent = ""; bar.hidden = false;
-      Office.postVideo(f, fm.t.value.trim(), fm.a.value, secs, fm.w.value === "1", {
-        onstep: function (t) { stepEl.textContent = t; bar.firstChild.style.width = "0%"; },
-        onprog: function (x) { bar.firstChild.style.width = Math.round(x * 100) + "%"; }
-      }).then(function (r) {
-        d.close(); d.remove(); location.href = "/watch/?v=" + encodeURIComponent(r.id);
-      }).catch(function (x) { btn.disabled = false; btn.textContent = "Post it"; bar.hidden = true; stepEl.textContent = ""; err.textContent = x.message || String(x); });
-    };
-  }
+  function postDialog() { H.postDialog(); }
 })();

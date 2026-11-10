@@ -1,10 +1,11 @@
-/* Shorts: tall videos up to 100 seconds, full screen. Swipe or scroll up
+/* Shorts: videos up to 100 seconds (tall ones fill the screen), full screen. Swipe or scroll up
    for the next one. The one on screen plays; the rest wait. */
 (function () {
   var $ = function (id) { return document.getElementById(id); }, esc = Office.esc;
   var start = new URLSearchParams(location.search).get("v"), muted = true;
   document.body.classList.add("shorts");
   var foot = document.querySelector("body > footer"); if (foot) foot.hidden = true;
+  $("postShort").onclick = function () { H.postDialog({ short: true }); };
   H.ready.then(function (st) {
     if (!st.user) { document.body.classList.remove("shorts"); $("main").innerHTML = H.signin("watch Shorts"); return; }
     H.sb.rpc("list_videos", { mine: false, lim: 120, shorts: true }).then(function (r) {
@@ -12,7 +13,7 @@
       var list = (r.data || []).filter(function (v) { return (v.shown && !v.hidden) || v.mine; });
       var i = list.map(function (v) { return v.id; }).indexOf(start);
       if (i > 0) list.unshift(list.splice(i, 1)[0]);
-      if (!list.length) { document.body.classList.remove("shorts"); $("main").innerHTML = '<div class="empty"><div style="font-size:3rem">📱</div><h2>No Shorts yet</h2><p>Make a tall video up to 100 seconds in Vids, or post one from your phone.</p><a class="of-btn" href="/">Back to the videos</a></div>'; return; }
+      if (!list.length) { document.body.classList.remove("shorts"); $("main").innerHTML = '<div class="empty"><div style="font-size:3rem">📱</div><h2>No Shorts yet</h2><p>Post any video up to 100 seconds - from your phone, your computer or Vids.</p><button type="button" class="of-btn" onclick="H.postDialog({ short: true })">＋ Post a Short</button> <a class="of-btn" href="/">Back to the videos</a></div>'; return; }
       return H.urls(list.map(function (v) { return v.path; })).then(function (u) { draw(list, u); });
     });
   });
